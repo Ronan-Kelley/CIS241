@@ -1,23 +1,161 @@
 #!/bin/env bash
 
+# 
+# @author Ronan Kelley
+#
+# usage:
+#	clean - removes files generated from the various problems
+#	<number>|<#> - runs the problem corresponding to the given number
+#
+#	if run with no args, script will clean all files and run all problems in order
+#
+
+# helper func
+function clean() {
+  rm -f new_dict MyFile.c faculty* clean_limits a.out dna* file decoded lyrics ending_lyrics
+}
+
 # problem one
-sed 's/color/colour/;s/honor/honour/;s/behavior/behaviour/;s/humor/humour/' /usr/share/dict/american-english > new_dict
+function problem_one() {
+  sed 's/color/colour/;s/honor/honour/;s/behavior/behaviour/;s/humor/humour/' /usr/share/dict/american-english > new_dict
+}
 
 # problem two
-cp '/home/woodriir/241/prog.c' ./MyFile.c
-sed -r -i 's/FOOPS/if/;s/BEEPBOOP/\/\*\*/'
-clang MyFile.c
-# clang doesn't seem to exist on the vm...
-# gcc MyFile.c
-./a.out
+function problem_two() {
+  # copy file over
+  cp '/home/woodriir/241/prog.c' ./MyFile.c
+  # replace FOOPS/BEEPBOOP with if//**, respectively
+  sed -r -i 's/FOOPS/if/g;s/BEEPBOOP/\/\*\*/g' MyFile.c
+  # compile
+  clang MyFile.c
+  # if you uncomment this next line, it will automatically run the compiled program
+  # unfortunately, it will also prevent the rest of the script from running until it finishes running, which takes a while
+  #./a.out
+}
 
 # problem three
-wget 'https://cis.gvsu.edu/faculty'
-sed -r '/<script.*>/,/<\/script>/d'
+function problem_three() {
+  # download webpage
+  wget 'https://cis.gvsu.edu/faculty'
+  # delete javascript (an example we should all strive to follow)
+  sed -r '/<script.*>/,/<\/script>/d' faculty > faculty.index
+}
 
-# problem 4
-sed -r -n '/\s*#\s*define\s*.*/p' /usr/include/limits.h | sed -r 's/\s*#\s*define\s*(.*)/\1/g' > clean_limits.h
+# problem four
+function problem_four() {
+  # two part! I couldn't get sed to only print out the lines I wanted with only one
+  # command, even if I split that command with semicolons
+  sed -r -n '/\s*#\s*define\s*.*/p' /usr/include/limits.h | sed -r 's/\s*#\s*define\s*(.*)/\1/g' > clean_limits.h
+}
 
-# problem 5
+# problem five
+function problem_five() {
+  # copy file
+  cp '/home/woodriir/241/txt_files/dna.txt' .
+  # replace all instances of 'Gattaca' with '@@GREAT MOVIE@@'
+  sed -r -i.ORIG 's/gattaca/@@GREAT MOVIE@@/g' dna.txt
+}
+
+# problem six
+function problem_six() {
+  # copy file
+  cp '/home/woodriir/file' .
+  # run sed script
+  sed -f scriptFile file > decoded
+  # contents of decoded should be "SUPERSTAR" with a newline
+}
+
+# problem seven
+function problem_seven() {
+  # copy file
+  cp /home/woodriir/241/lyrics .
+  # print 50 lines in reverse order
+  sed -ne ':a;$p;N;51,$D;ba' lyrics > ending_lyrics
+  # my understanding of how that last line works:
+  #  -n flag to not print un-captured lines
+  #  -e flag to treat the expression as a full-on script
+  #  :a as a label (similar to labels in batch)
+  #  $p to print final line and quit
+  #  N to "slurp" the next line (I don't fully understand what this means; I think
+  #    it adds the next line to the buffer, treating the current and next line as one
+  #    line
+  #  51 is the number of lines to start back + 1: I have no idea why
+  #    you need to start one back
+  #  $D to remove the first line from pattern space (I don't know why this works
+  #    this way, either - nor do I understand the difference between $d and $D very
+  #    well, as I couldn't find documentation on specifically $D
+  #  ba loop back to :a label (again, like in batch scripting)
+}
+
+# problem eight
+function problem_eight() {
+  # print processors
+  lscpu | sed -n '/^CPU(s)/p' | sed -r 's/\s+/ /g'
+  # print physical memory stats
+  echo "======="
+  echo "Memory:"
+  echo "======="
+  free -h | sed -n '1,2p' | sed -r 's/Gi/ Gigabytes/g;s/Mi/ Megabytes/g;s/\s\s+/   /g'
+  # print disk info
+  echo ""
+  echo "======="
+  echo "Disks: "
+  echo "======="
+  df -h | sed -r -n '1p;/.*\d*T/p'
+  # date
+  echo ""
+  echo "======="
+  echo "Date:  "
+  echo "======="
+  # yes, this is supposed to be multiline, I know. However, I wrote it out this way,
+  # and I'm kind of proud of the spaghetti monster I have created.
+  date | sed -r 's/Sun/Sunday,/;s/Mon/Monday,/;s/Tues/Tuesday,/;s/Wed/Wednesday,/;s/Thurs/Thursday,/;s/Fri/Friday,/;s/Sat/Saturday,/;s/Jan/January/;s/Feb/February/;s/Aug/August/;s/Sept/September/;s/Oct/October/;s/Nov/November/;s/Dec/December/;s/AM/a.m./;s/PM/p.m./;s/EST/Eastern Standard/;s/([a-zA-Z]*, [a-zA-Z]* [0-9]{2} )([0-9]{2}:[0-9]{2}:[0-9]{2} [a-z]\.[a-z]\. [a-zA-Z]* [a-zA-Z]*) ([0-9]{4})/\1\3.\2/'
+}
+
+# handle args and run things
+for arg in $*; do
+  case "$arg" in
+    clean)
+      clean
+      ;;
+    one|1)
+      problem_one
+      ;;
+    two|2)
+      problem_two
+      ;;
+    three|3)
+      problem_three
+      ;;
+    four|4)
+      problem_four
+      ;;
+    five|5)
+      problem_five
+      ;;
+    six|6)
+      problem_six
+      ;;
+    seven|7)
+      problem_seven
+      ;;
+    eight|8)
+      problem_eight
+      ;;
+  esac
+done
+
+# run everything in order if there are no arguments
+[ -z "$1" ] && {
+  clean
+  problem_one
+  problem_two
+  problem_three
+  problem_four
+  problem_five
+  problem_six
+  problem_seven
+  problem_eight
+}
 
 # vim: syntax=sh
