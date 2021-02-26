@@ -1,0 +1,23 @@
+#!/bin/env bash
+
+# problem one
+sed 's/color/colour/;s/honor/honour/;s/behavior/behaviour/;s/humor/humour/' /usr/share/dict/american-english > new_dict
+
+# problem two
+cp '/home/woodriir/241/prog.c' ./MyFile.c
+sed -r -i 's/FOOPS/if/;s/BEEPBOOP/\/\*\*/'
+clang MyFile.c
+# clang doesn't seem to exist on the vm...
+# gcc MyFile.c
+./a.out
+
+# problem three
+wget 'https://cis.gvsu.edu/faculty'
+sed -r '/<script.*>/,/<\/script>/d'
+
+# problem 4
+sed -r -n '/\s*#\s*define\s*.*/p' /usr/include/limits.h | sed -r 's/\s*#\s*define\s*(.*)/\1/g' > clean_limits.h
+
+# problem 5
+
+# vim: syntax=sh
