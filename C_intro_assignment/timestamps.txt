@@ -1,0 +1,16 @@
+5.
+	all:
+		13:31
+
+6.
+	main.o:
+		13:31
+	libCircle.o:
+		13:34
+	a.out:
+		13:34
+
+main.o's timestamp did not change, as main.c was not modified and as such did not have to be re-compiled; it simply had to be re-linked, which does not involve modifying the file itself.
+
+7.
+	the timestamps of all of the files changed, but that is probably because I had to modify circleLib.c, as defining PI twice (once in the header file, once in the .c file) wasn't working since PI was defined as a constant.
