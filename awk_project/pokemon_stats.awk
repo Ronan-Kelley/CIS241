@@ -4,6 +4,9 @@ BEGIN {
 	highestTotal=0;
 	bestPokemon="";
 
+	lowestTotal=-1;
+	bestPokemon="";
+
 	totalRows=0;
 	totalTotal=0;
 	totalHP=0;
@@ -58,6 +61,20 @@ BEGIN {
 	}
 }
 
+# find worst pokemon overall
+/^[0-9]/ {
+	if (lowestTotal == -1) {
+		lowestTotal=$5
+		worstPokemon=$2
+	}
+	if ($5 < lowestTotal) {
+		lowestTotal=$5;
+		worstPokemon=$2;
+	} else if ($5 == highestTotal) {
+		worstPokemon=worstPokemon "\n\t" $2
+	}
+}
+
 function getLongestKeyLen(arr) {
 	longest=0
 	for (i in arr) {
@@ -78,6 +95,9 @@ function normalizeSpaces(curVal, longestVal) {
 END {
 	# most powerful overall
 	print "the overall most powerful Pokemon, with a total score of " highestTotal " is/are:\n\t" bestPokemon;
+
+	# least powerful overall
+	print "the overall least powerful pokemon, with a total score of " lowestTotal " is/are:\n\t" worstPokemon;
 
 	# overall averages
 	print "overall averages:  "
