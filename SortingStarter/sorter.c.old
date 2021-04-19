@@ -1,0 +1,85 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void swap_ptrs(char** strA, char** strB) {
+	char* tmp = *strA;
+	*strA = *strB;
+	*strB = tmp;
+}
+
+void quicksort_strs(char *vals[], unsigned int len) {
+	unsigned int i, pvt=0;
+
+	if (len <= 1)
+		return;
+
+	// swap a randomly selected value to the last node
+	swap_ptrs(vals + ((unsigned int) rand() % len), vals + len - 1);
+
+	// reset the pivot index to zero, then scan
+	for (i=0;i<len-1;++i) {
+		if (strcmp(vals[i], vals[len-1]) < 0)
+			swap_ptrs(vals+i, vals+pvt++);
+	}
+
+	// move the pivot value into its place
+	swap_ptrs(vals + pvt, vals + len - 1);
+
+	// and invoke on the subsequences. does NOT include the pivot-slot
+	quicksort_strs(vals, pvt++);
+	quicksort_strs(vals + pvt, len - pvt);
+}
+
+void deep_copy_strs(char** in, char** out, int inSize) {
+	for (int i = 0; i < inSize; ++i) {
+		*(*out + i) = *(*in + i);
+	}
+}
+
+/**
+ * @param contents file contents
+ * @param size number of lines in the file
+ */
+void sort(char** contents, int size) {
+	char* lines[size];
+	int curLine = 0;
+	int contentsPointer = 0;
+	int wordPointer = 0;
+	char curChar;
+	int fileSize = 0;
+
+	lines[0] = malloc(sizeof(char *));
+
+	// build array of words
+	while (curLine < size) {
+		// get next character in buffer
+		curChar = *(*contents + contentsPointer);
+		// increment 'pointer' that tracks current character in buffer
+		contentsPointer++;
+		fileSize++;
+
+		// if character is not a newline, add it to the array of words at the proper location
+		if (curChar != '\n') {
+			*(*(lines + curLine) + wordPointer) = curChar;
+			wordPointer++;
+		} else {
+			// if character is a newline, reset the word pointer, increment the current line, and allocate memory
+			wordPointer = 0;
+			curLine++;
+			lines[curLine] = malloc(sizeof(char *));
+		}
+	}
+
+	quicksort_strs(lines, size);
+	deep_copy_strs(lines, contents, fileSize);
+
+	for (int i = 0; i < size; ++i) {
+		printf("value %d: %s\n", i, lines[i]);
+	}
+
+	// free allocated memory before exiting
+	for (int i = 0; i < size; ++i) {
+		free(lines[i]);
+	}
+}
