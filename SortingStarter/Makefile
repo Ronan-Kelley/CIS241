@@ -1,9 +1,9 @@
-default: build debug
+default: build run
 
-exec: build run
+dbg: build debug
 
 build:
-	gcc -g main.c sorter.c file_lib.o
+	clang -g -O0 main.c sorter.c file_lib.o -o a.out
 
 run:
 	./a.out out_of_order_file tmp.txt

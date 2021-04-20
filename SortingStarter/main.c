@@ -21,15 +21,42 @@ int main(int argc, char** argv){
 	size_t byte_count = load_file(argv[1], fc_buffer);
 
 	// determine line count
-	/* int lines = 0; */
-	/* for (int i = 0; i < byte_count; ++i) { */
-		/* printf("reading '%c' (%d)\n", *(*fc_buffer + i), *(*fc_buffer + i)); */
-		/* if (*(*fc_buffer + i) == '\n') { */
-			/* ++lines; */
-		/* } */
-	/* } */
+	int lines = 0;
+	for (int i = 0; i < byte_count; ++i) {
+		// printf("reading '%c' (%d)\n", *(*fc_buffer + i), *(*fc_buffer + i));
+		if (*(*fc_buffer + i) == '\n') {
+			++lines;
+		}
+	}
+
+	char** fc_lines = malloc(sizeof(char**));
+	fc_lines[0] = malloc(sizeof(char *));
+	int curByteBuf = 0;
+	int curLine = 0;
+	int curByteLine = 0;
+	char curChar = ' ';
+	while (curLine < lines) {
+		// get next character in buffer
+		curChar = *(*fc_buffer + curByteBuf);
+		// increment pointer that tracks current character in buffer
+		++curByteBuf;
+
+		// if character is not a newline, add it to array of words
+		if (curChar != '\n') {
+			//printf("Line: %d, Char %d: %c\n", curLine, curByteLine, /*curChar*(*(fc_lines + curLine) + curByteLine) =*/ curChar);
+			*(*(fc_lines + curLine) + curByteLine) = curChar;
+			++curByteLine;
+		} else {
+			// if character is a newline, move pointers to next line/beginning of word, and allocate memory
+			curByteLine = 0;
+			++curLine;
+			fc_lines[curLine] = malloc(sizeof(char *));
+		}
+	}
+	
 
 	free(*fc_buffer);
+	free(fc_lines);
 
 	/* char** fc_lines; */
 	/* *fc_lines = malloc(sizeof(char*)); */
