@@ -11,7 +11,16 @@
  */
 
 #define ORGANIZE_STEP 1
+#define ORGANIZE_DEBUG 0
 #define SORT_STEP 1
+#define SORT_DEBUG 0
+#define WRITE_STEP 1
+
+void printLineSortedBuffer(char** buffer, int lines, char endChar) {
+	for (int i = 0; i < lines; ++i) {
+		printf("line %d: %s%c", i, *(buffer + i), endChar);
+	}
+}
 
 int main(int argc, char** argv){
 	// handle args
@@ -70,26 +79,44 @@ int main(int argc, char** argv){
 				/* printf("curLine: %s", *(fc_lines + curLine)); */
 				curByteLine = 0;
 				++curLine;
-				*(fc_lines + curLine) = malloc(sizeof(char *));
+				/* *(fc_lines + curLine) = malloc(sizeof(char *)); */
 			}
 		}
 
-		for (int i = 0; i < lines; ++i) {
-			printf("fc_lines[%d]: %s\n", i, *(fc_lines + i));
-		}
-
-		printf("lines organized!\n");
+		if (ORGANIZE_DEBUG) printLineSortedBuffer(fc_lines, lines, '\n');
 	}
 
 
 	// Sort the file with the function you wrote.
 	if (SORT_STEP) {
-		sort(fc_buffer, lines);
-		printf("lines sorted!\n");
+		sort(fc_lines, lines);
+		if (SORT_DEBUG) printLineSortedBuffer(fc_lines, lines, '\n');
 	}
 
 	// Write out the new file.
-	/* save_file(argv[2], *fc_lines, byte_count); */
+	if (WRITE_STEP) {
+		char* output = malloc(byte_count + 1);
+		int curByteOutput = 0;
+		int j = 0;
+
+		for (int i = 0; i < lines; ++i) {
+			j = 0;
+			while (fc_lines[i][j] != '\0') {
+				/* printf("%d:%d = %c\n", i, j, fc_lines[i][j]); */
+				output[curByteOutput] = fc_lines[i][j];
+				++j;
+				++curByteOutput;
+			}
+			output[curByteOutput] = '\n';
+			++curByteOutput;
+		}
+
+		output[byte_count] = '\0';
+
+		save_file(argv[2], output, byte_count + 1);
+
+		free(output);
+	}
 
 	// free fc_buffer
 	free(*fc_buffer);

@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-/* #include <string.h> */
 
 void swap_ptrs(char** strA, char** strB) {
 	char* tmp = *strA;
