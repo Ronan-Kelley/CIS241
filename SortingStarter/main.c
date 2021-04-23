@@ -11,7 +11,7 @@
  */
 
 #define ORGANIZE_STEP 1
-#define SORT_STEP 0
+#define SORT_STEP 1
 
 int main(int argc, char** argv){
 	// handle args
@@ -44,29 +44,30 @@ int main(int argc, char** argv){
 	fflush(NULL);
 
 	/* char** fc_lines = malloc(sizeof(char**)); */
-	char** fc_lines = malloc(byte_count);
-	fc_lines[0] = malloc(sizeof(char *));
+	char** fc_lines = malloc(sizeof(char*) * lines);
+	/* fc_lines[0] = malloc(sizeof(char *)); */
 	size_t curByteBuf = 0;
 	size_t curLine = 0;
 	size_t curByteLine = 0;
 	if (ORGANIZE_STEP) {
 		while (curLine < lines && curByteBuf < byte_count) {
-			// get next character in buffer
-			const char curChar = *(*fc_buffer + curByteBuf);
+			// get address of next character in buffer
+			char* curChar = *fc_buffer + curByteBuf;
 			// increment pointer that tracks current character in buffer
 			++curByteBuf;
 
 			// if character is not a newline, add it to array of words
-			if (curChar != '\n' && curChar != '\r' && curChar != '\f') {
+			if (*curChar != '\n' && *curChar != '\r' && *curChar != '\f') {
 				/* printf("Line: %lu, Char %lu: %c\n", curLine, curByteLine, curChar); */
-				*(*(fc_lines + curLine) + curByteLine) = curChar;
+				/* *(*(fc_lines + curLine) + curByteLine) = curChar; */
+				*((fc_lines + curLine) + curByteLine) = curChar;
 				/* printf("Line: %lu, Char %lu: %c (from array)\n", curLine, curByteLine, *(*(fc_lines + curLine) + curByteLine)); */
 				++curByteLine;
 			} else {
 				// if character is a newline, move pointers to next line/beginning of word, and allocate memory
 				// additionally, insert the newline to the end of the chunk
-				*(*(fc_lines + curLine) + curByteLine) = '\n';
-				printf("curLine: %s", *(fc_lines + curLine));
+				*(*(fc_lines + curLine) + curByteLine) = '\0';
+				/* printf("curLine: %s", *(fc_lines + curLine)); */
 				curByteLine = 0;
 				++curLine;
 				*(fc_lines + curLine) = malloc(sizeof(char *));
@@ -74,26 +75,30 @@ int main(int argc, char** argv){
 		}
 
 		for (int i = 0; i < lines; ++i) {
-			printf("fc_lines[%d]: %s", i, *(fc_lines + i));
+			printf("fc_lines[%d]: %s\n", i, *(fc_lines + i));
 		}
+
+		printf("lines organized!\n");
 	}
 
-	// free fc_buffer
-	free(*fc_buffer);
-	free(fc_buffer);
 
 	// Sort the file with the function you wrote.
 	if (SORT_STEP) {
 		sort(fc_buffer, lines);
+		printf("lines sorted!\n");
 	}
 
 	// Write out the new file.
 	/* save_file(argv[2], *fc_lines, byte_count); */
 
+	// free fc_buffer
+	free(*fc_buffer);
+	free(fc_buffer);
+
 	// free fc_lines
-	for (int i = 0; i < lines; ++i) {
-		free(fc_lines[i]);
-	}
+	//for (int i = 0; i < lines; ++i) {
+	//	free(fc_lines[i]);
+	//}
 	free(fc_lines);
 }
 
