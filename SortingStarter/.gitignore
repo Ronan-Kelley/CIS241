@@ -1,0 +1,3 @@
+# don't need to include binary blobs in version control history
+*.out
+**/tmp.txt
